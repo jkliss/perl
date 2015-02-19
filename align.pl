@@ -8,26 +8,34 @@ open(FILE2, $ARGV[1]);
 
 my @file1 = <FILE1>;
 my @file2 = <FILE2>;
+chomp(@file1);
+chomp(@file2);
 my $match = "";
 my $ident = 0;
 my $sim = 0;
 
+
 for(my $ln = 0; $ln <= $#file1; $ln++)
 {
-	print "$file1[$ln]\n";
-	print "$file2[$ln]\n";
-	for(my $pos = 0; $pos < length($file1[$ln]); $pos++)
+	if(substr($file1[$ln], 0, 1) ne ">")
 	{
-		if(substr($file1[$ln], $pos, 1) eq substr($file2[$ln], $pos, 1))
+		print "$file1[$ln]\n";
+		print "$file2[$ln]\n";
+		for(my $pos = 0; $pos < length($file1[$ln]); $pos++)
 		{
-			$match .= "*";
-			$ident++;
+			if(substr($file1[$ln], $pos, 1) eq substr($file2[$ln], $pos, 1))
+			{
+				$match .= "*";
+				$ident++;
+			}
+			else
+			{
+				$match .= " ";
+			}
 		}
-		else
-		{
-			$match .= " ";
-		}
+		print "$match\n";
+		$match = "";
 	}
-	print "$match\n";
-	print "Identity: $ident\n";
+
 }
+	print "Identity: $ident\n";

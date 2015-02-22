@@ -8,7 +8,6 @@ open(MATRIX, "blosum62") or die "Datei nicht gefunden\n";
 my @rawMAT = <MATRIX>;
 my @mat;
 my @head = ();
-my @combined;
 my @rows;
 my %order;
 my $ordercount = 0;
@@ -34,7 +33,7 @@ for(my $k = 0; $k <= $#mat; $k++)
 			push(@head, $splits[$i]);
 		}
 	}
-	if(!%order)
+	if(!%order)## Befüllen der Order Hashes mit Buchstaben als Schlüssel und ihre Position im Array als Value
 	{
 		foreach my $m (@head)
 		{
@@ -49,7 +48,14 @@ for(my $k = 0; $k <= $#mat; $k++)
 	}
 }
 
+open(TEST, "testsequenzen")
+my @seqs = <TEST>;
 
+for(my $el = 0; $el <= $#seqs; $el++)
+{
+	
+
+}
 #print @{$rows[5]}[7]; #### Beispiel für das Array, 0 ist die Anzahl der Reihen exklusive head
 #                              1 ist die Position im Array inklusive Buchstaben
 

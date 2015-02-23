@@ -29,14 +29,17 @@ foreach my $element_seq (@seq)
 }
 
 my @sep_char = (\@xseq, \@yseq);
-#print @{$sep_char[0]}[0];
+print @{$sep_char[0]};
+print "\n";
+print @{$sep_char[1]};
+print "\n";
 
 my @yaxis;
 ### 
-for(my $y_count = 0; $y_count < $#yseq; $y_count++)
+for(my $y_count = 0; $y_count <= $#yseq; $y_count++)
 {
 	my @xaxis;
-	for(my $x_count = 0; $x_count < $#xseq; $x_count++)
+	for(my $x_count = 0; $x_count <= $#xseq; $x_count++)
 	{
 		if($xseq[$x_count] eq $yseq[$y_count])
 		{
@@ -65,8 +68,10 @@ for(my $elq = 0; $elq <= $#yaxis; $elq++)
 
 
 my $fnd = 0;
+my $n_fnd = 0;
 my $x_count = 0;
 my $y_count = 0;
+my $score = 0;
 my @hitlist;
 my @xaxis = @{$yaxis[0]};
 
@@ -74,16 +79,17 @@ while($y_count <= $#yaxis && $x_count <= $#xaxis)
 {
 	if(defined(@{$yaxis[$y_count]}[$x_count]) && @{$yaxis[$y_count]}[$x_count] == 1)
 	{
-		push(@hitlist, $x_count.$y_count);
+		push(@hitlist, $x_count.":".$y_count);
 		#Erhöhen von Achsen um 1
 		
 		$x_count++;
 		$y_count++;
+		$score++;
 	}
 	else
 	{
 		my $mod = 1;
-		while($fnd == 0 && $mod < 3)
+		while($fnd == 0 && $mod < 5)
 		{
 			if(defined(@{$yaxis[$y_count+$mod]}[$x_count]) && @{$yaxis[$y_count+$mod]}[$x_count] == 1)
 			{
@@ -105,10 +111,11 @@ while($y_count <= $#yaxis && $x_count <= $#xaxis)
 		}
 		if($fnd == 1)
 		{
-			push(@hitlist, $x_count.$y_count);
+			push(@hitlist, $x_count.":".$y_count);
 			$x_count++;
 			$y_count++;
 			#Ausgabe der Achsen und erhöhen um 1	
+			$score++;
 			$fnd = 0;
 		}
 		else
@@ -117,30 +124,80 @@ while($y_count <= $#yaxis && $x_count <= $#xaxis)
 			$y_count++;
 		}
 	}
-
-	#else
-	#{
-		#my ($xhit, $yhit);
-		#while(@{$yaxis[$y_count]}[$x_count] != 1 or $y_count == $#yaxis)
-		#{
-			#$y_count++;
-			#if(@{$yaxis[$y_count]}[$x_count] == 1)
-			#{
-				##Ausgeben der Treffer $yhit
-			#}
-		#}
-		#while(@{$yaxis[$y_count]}[$x_count] != 1 or $x_count == $x_axis)
-		#{
-			#$x_count++;
-			#if(@{$yaxis[$y_count]}[$x_count] == 1)
-			#{
-				##Ausgeben der Treffer $xhit
-			#}
-		#}
-		##Vergleich xhit mit yhit -> niedrigstes nehmen
-		##Erhöhen der Achsen um 1
-	#}
 }
-	
-print @hitlist;
+
+print "\n##############################################################\n";
+print "Positions of matches:\n";
+foreach my $pair (@hitlist)
+{
+	print $pair." ";
+}
 ## Jeweils paarweise 
+print "\nScore: $score\n";
+print "##############################################################\n";
+
+### Seqs inklusive Gaps
+my $seq_gap1 = "";
+my $seq_gap2 = "";
+my $posx = 0;
+my $posy = 0;
+my $hitlist_cnt = 0;
+my @seq_tmp = split(":", $hitlist[0]);
+
+while($posx <= $#xseq or $posy <= $#yseq)
+{
+	print $hitlist_cnt."\t$posx\t$posy\n";
+	@seq_tmp = split(":", $hitlist[$hitlist_cnt]);
+	if($seq_tmp[0] == $posx && $seq_tmp[1] == $posy)
+	{
+		$hitlist_cnt++;
+	}
+	if($seq_tmp[0] == $posx && $seq_tmp[1] == $posy)
+	{
+		$seq_gap1 .= $xseq[$posx];
+		$seq_gap2 .= $yseq[$posy];
+		$posx++;
+		$posy++;
+	}
+	elsif($seq_tmp[1] > $posy)
+	{
+		$seq_gap1 .= "-";
+		$seq_gap2 .= $yseq[$posy];
+		$posy++;
+	}
+	elsif($seq_tmp[0] > $posx)
+	{
+		$seq_gap2 .= "-";
+		$seq_gap1 .= $xseq[$posx];
+		$posx++;
+	}
+	if($#hitlist <= $hitlist_cnt)
+	{
+		if($posx <= $#xseq) 
+		{
+			$seq_gap1 .= $xseq[$posx];
+			$posx++;
+		}
+		if($posy <= $#yseq)
+		{
+			$seq_gap2 .= $yseq[$posy];
+			$posy++;
+		}
+	}
+}
+#for(my $strc = 0; $strc <= $#hitlist; $strc++)
+#{
+	#my @seq_tmp = split(":", $hitlist[$strc]);
+	#if($seq_tmp[0] == $seq_tmp[1])
+	#{
+		#$seq_gap1 .= $xseq[$strc];
+		#$seq_gap2 .= $yseq[$strc];
+	#}
+	#if($seq_tmp[0] < $seq_tmp[1])
+	#{
+		#$seq_gap1
+	#}
+#}
+print "\n";
+print $seq_gap1."\n";
+print $seq_gap2."\n";
